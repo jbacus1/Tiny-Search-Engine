@@ -1,0 +1,180 @@
+----- Argument Tests -----
+1) No arguments
+Usage: ./querier pageDirectory indexFilename
+2) Only one arg
+Usage: ./querier pageDirectory indexFilename
+3) Bad directory
+Error: invalid crawler directory 'not-a-dir'
+4) Bad index file
+Error: cannot open index file 'not-a-index'
+------- Querier Tests -------
+Running testquery1:
+Query? Error: bad char '#' in query.
+Query? Query: the
+Matches 1 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+----------------------------------------
+Query? Query: the for
+Matches 9 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+score	1 doc   2: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+score	1 doc   3: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+score	1 doc   4: http://cs50tse.cs.dartmouth.edu/tse/letters/E.html
+score	1 doc   5: http://cs50tse.cs.dartmouth.edu/tse/letters/G.html
+score	1 doc   6: http://cs50tse.cs.dartmouth.edu/tse/letters/H.html
+score	1 doc   7: http://cs50tse.cs.dartmouth.edu/tse/letters/F.html
+score	1 doc   8: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+score	1 doc   9: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
+----------------------------------------
+Query? Query: for home and page
+Matches 1 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+----------------------------------------
+Query? Query: algorithm
+Matches 1 documents (sorted by score in order):
+score	1 doc   2: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+----------------------------------------
+Query? Error: 'or' cannot be first word
+Query? Query: for or algorithm
+Matches 9 documents (sorted by score in order):
+score	2 doc   2: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+score	1 doc   3: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+score	1 doc   4: http://cs50tse.cs.dartmouth.edu/tse/letters/E.html
+score	1 doc   5: http://cs50tse.cs.dartmouth.edu/tse/letters/G.html
+score	1 doc   6: http://cs50tse.cs.dartmouth.edu/tse/letters/H.html
+score	1 doc   7: http://cs50tse.cs.dartmouth.edu/tse/letters/F.html
+score	1 doc   8: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+score	1 doc   9: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
+----------------------------------------
+Query? Query: graph for page
+Matches 1 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+----------------------------------------
+Query? 
+Running testquery2:
+Query? Error: bad char '#' in query.
+Query? Query: the home
+Matches 9 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+score	1 doc   2: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+score	1 doc   3: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+score	1 doc   4: http://cs50tse.cs.dartmouth.edu/tse/letters/E.html
+score	1 doc   5: http://cs50tse.cs.dartmouth.edu/tse/letters/G.html
+score	1 doc   6: http://cs50tse.cs.dartmouth.edu/tse/letters/H.html
+score	1 doc   7: http://cs50tse.cs.dartmouth.edu/tse/letters/F.html
+score	1 doc   8: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+score	1 doc   9: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
+----------------------------------------
+Query? Query: the or home
+Matches 9 documents (sorted by score in order):
+score	3 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+score	1 doc   2: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+score	1 doc   3: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+score	1 doc   4: http://cs50tse.cs.dartmouth.edu/tse/letters/E.html
+score	1 doc   5: http://cs50tse.cs.dartmouth.edu/tse/letters/G.html
+score	1 doc   6: http://cs50tse.cs.dartmouth.edu/tse/letters/H.html
+score	1 doc   7: http://cs50tse.cs.dartmouth.edu/tse/letters/F.html
+score	1 doc   8: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+score	1 doc   9: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
+----------------------------------------
+Query? Error: 'and' cannot be first word
+Query? Error: 'or' cannot be first word
+Query? Query: huffman computational
+Matches 1 documents (sorted by score in order):
+score	1 doc   9: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
+----------------------------------------
+Query? Query: fast and first
+Matches 2 documents (sorted by score in order):
+score	1 doc   3: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+score	1 doc   8: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+----------------------------------------
+Query? 
+Running testquery3:
+Query? Error: bad char '#' in query.
+Query? Query: for page or the
+Matches 1 documents (sorted by score in order):
+score	2 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+----------------------------------------
+Query? Query: the graph or traversal
+Matches 1 documents (sorted by score in order):
+score	2 doc   5: http://cs50tse.cs.dartmouth.edu/tse/letters/G.html
+----------------------------------------
+Query? Query: fast fourier or transform
+Matches 1 documents (sorted by score in order):
+score	2 doc   7: http://cs50tse.cs.dartmouth.edu/tse/letters/F.html
+----------------------------------------
+Query? Query: home and depth
+Matches 1 documents (sorted by score in order):
+score	1 doc   8: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+----------------------------------------
+Query? Query: this or coding
+Matches 2 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+score	1 doc   6: http://cs50tse.cs.dartmouth.edu/tse/letters/H.html
+----------------------------------------
+Query? Query: search first
+Matches 2 documents (sorted by score in order):
+score	1 doc   3: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+score	1 doc   8: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+----------------------------------------
+Query? 
+------- Valgrind Test ------
+==991777== Memcheck, a memory error detector
+==991777== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==991777== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==991777== Command: ./querier ../data/letters-10 ../data/indexes/letters-10.index
+==991777== 
+Query? Error: bad char '#' in query.
+Query? Query: the
+Matches 1 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+----------------------------------------
+Query? Query: the for
+Matches 9 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+score	1 doc   2: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+score	1 doc   3: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+score	1 doc   4: http://cs50tse.cs.dartmouth.edu/tse/letters/E.html
+score	1 doc   5: http://cs50tse.cs.dartmouth.edu/tse/letters/G.html
+score	1 doc   6: http://cs50tse.cs.dartmouth.edu/tse/letters/H.html
+score	1 doc   7: http://cs50tse.cs.dartmouth.edu/tse/letters/F.html
+score	1 doc   8: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+score	1 doc   9: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
+----------------------------------------
+Query? Query: for home and page
+Matches 1 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+----------------------------------------
+Query? Query: algorithm
+Matches 1 documents (sorted by score in order):
+score	1 doc   2: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+----------------------------------------
+Query? Error: 'or' cannot be first word
+Query? Query: for or algorithm
+Matches 9 documents (sorted by score in order):
+score	2 doc   2: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+score	1 doc   3: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+score	1 doc   4: http://cs50tse.cs.dartmouth.edu/tse/letters/E.html
+score	1 doc   5: http://cs50tse.cs.dartmouth.edu/tse/letters/G.html
+score	1 doc   6: http://cs50tse.cs.dartmouth.edu/tse/letters/H.html
+score	1 doc   7: http://cs50tse.cs.dartmouth.edu/tse/letters/F.html
+score	1 doc   8: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+score	1 doc   9: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
+----------------------------------------
+Query? Query: graph for page
+Matches 1 documents (sorted by score in order):
+score	1 doc   1: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+----------------------------------------
+Query? ==991777== 
+==991777== HEAP SUMMARY:
+==991777==     in use at exit: 0 bytes in 0 blocks
+==991777==   total heap usage: 768 allocs, 768 frees, 238,941 bytes allocated
+==991777== 
+==991777== All heap blocks were freed -- no leaks are possible
+==991777== 
+==991777== For lists of detected and suppressed errors, rerun with: -s
+==991777== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+Done

@@ -1,0 +1,241 @@
+ml () {  module ml "$@"
+}
+module () {  local _mlredir=1;
+ if [ -n "${MODULES_REDIRECT_OUTPUT+x}" ]; then
+ if [ "$MODULES_REDIRECT_OUTPUT" = '0' ]; then
+ _mlredir=0;
+ else
+ if [ "$MODULES_REDIRECT_OUTPUT" = '1' ]; then
+ _mlredir=1;
+ fi;
+ fi;
+ fi;
+ case " $@ " in 
+ *' --no-redirect '*)
+ _mlredir=0
+ ;;
+ *' --redirect '*)
+ _mlredir=1
+ ;;
+ esac;
+ if [ $_mlredir -eq 0 ]; then
+ _module_raw "$@";
+ else
+ _module_raw "$@" 2>&1;
+ fi
+}
+_module_raw () {  eval "$(/usr/bin/tclsh8.6 '/usr/lib/x86_64-linux-gnu/modulecmd.tcl' bash "$@")";
+ _mlstatus=$?;
+ return $_mlstatus
+}
+#!/bin/bash
+# testing.sh - test script for TSE Indexer
+#
+# Calls indexer with variety of arguments:
+#   1. Argument tests
+#   2. Valgrind test
+#   3. Indexer tests on various directories
+#   4. Uses indextest to load each index file, saves to another file,
+#      then compares them with indexcmp.
+#
+# Usage:
+#   bash -v testing.sh
+#     (can redirect output to testing.out)
+#
+# Author: Jacob Bacus
+# Date:   February 2025
+
+PROGRAM_INDEXER=./indexer
+PROGRAM_TESTER=./indextest
+
+# crawler produced directory locations
+DATADIR=../data
+# for new index files
+INDEXDIR=$DATADIR/indexes
+# path to indexcmp
+INDEXCMP=~/cs50-dev/shared/tse/indexcmp
+
+# Ensure $INDEXDIR exists
+mkdir -p "$INDEXDIR"
+
+# 1. Argument tests
+######################################
+echo
+
+echo "----- ARGUMENT TESTS -----"
+----- ARGUMENT TESTS -----
+
+echo "1) No arguments:"
+1) No arguments:
+$PROGRAM_INDEXER
+Usage: ./indexer pageDirectory indexFilename
+
+echo
+
+echo "2) Only one argument (missing indexFilename):"
+2) Only one argument (missing indexFilename):
+$PROGRAM_INDEXER $DATADIR/letters-0
+Usage: ./indexer pageDirectory indexFilename
+
+echo
+
+echo "3) Non-existent directory:"
+3) Non-existent directory:
+$PROGRAM_INDEXER $DATADIR/bad $INDEXDIR/out.index
+Invalid pageDirectory '../data/bad'
+
+echo
+
+echo "4) Directory not produced by crawler (missing .crawler):"
+4) Directory not produced by crawler (missing .crawler):
+mkdir -p $DATADIR/notcrawler
+$PROGRAM_INDEXER $DATADIR/notcrawler $INDEXDIR/test.index
+Invalid pageDirectory '../data/notcrawler'
+
+echo
+
+echo "5) Invalid indexFilename (cannot open for writing):"
+5) Invalid indexFilename (cannot open for writing):
+$PROGRAM_INDEXER $DATADIR/letters-0 /no-permission-dir/index.out
+Cannot open indexFilename '/no-permission-dir/index.out'
+
+# 2. Valgrind test
+################################
+echo
+
+echo "---- VALGRIND TEST (toscrape-1) ----"
+---- VALGRIND TEST (toscrape-1) ----
+VALGRIND_LOG=valgrind.out
+rm -f "$VALGRIND_LOG"
+
+valgrind --leak-check=full --show-leak-kinds=all --log-file="$VALGRIND_LOG" \
+         $PROGRAM_INDEXER $DATADIR/toscrape-1 $INDEXDIR/toscrape-1-val.index
+
+echo "Valgrind output saved in $VALGRIND_LOG"
+Valgrind output saved in valgrind.out
+echo "Index file is $INDEXDIR/toscrape-1-val.index"
+Index file is ../data/indexes/toscrape-1-val.index
+
+# run indextest to load that file, create a copy, compare them
+COPYFILE=$INDEXDIR/toscrape-1-val-copy.index
+rm -f "$COPYFILE"
+$PROGRAM_TESTER $INDEXDIR/toscrape-1-val.index $COPYFILE
+
+echo "Comparing $INDEXDIR/toscrape-1-val.index to $COPYFILE"
+Comparing ../data/indexes/toscrape-1-val.index to ../data/indexes/toscrape-1-val-copy.index
+if [ -x "$INDEXCMP" ]; then
+    $INDEXCMP $INDEXDIR/toscrape-1-val.index $COPYFILE
+else
+    diff -q $INDEXDIR/toscrape-1-val.index $COPYFILE
+fi
+
+
+# 3. Indexer tests
+########################################
+# index each directory, run indextest, then compare.
+
+ALL_DIRS=(
+  letters-0 letters-1 letters-2 letters-10
+  toscrape-0 toscrape-1 toscrape-3
+  wikipedia-0 wikipedia-2
+)
+
+echo
+
+echo "----- INDEXER TESTS -----"
+----- INDEXER TESTS -----
+
+for dir in "${ALL_DIRS[@]}"; do
+  PAGESDIR="$DATADIR/$dir"
+  OUTFILE="$INDEXDIR/$dir.index"
+
+  echo
+  echo "Indexing $PAGESDIR -> $OUTFILE"
+  rm -f "$OUTFILE"
+
+  # run the indexer
+  $PROGRAM_INDEXER "$PAGESDIR" "$OUTFILE"
+
+  # check for output fil
+  if [ ! -f "$OUTFILE" ]; then
+      echo "Failed to produce $OUTFILE"
+      continue
+  fi
+
+  # run indextest to read file and copy
+  COPYFILE="$INDEXDIR/$dir-copy.index"
+  rm -f "$COPYFILE"
+  echo "indextest $OUTFILE -> $COPYFILE"
+  $PROGRAM_TESTER "$OUTFILE" "$COPYFILE"
+
+  # compare (I had issues using indexcmp so I check if i need to use diff)
+  echo "Compare $OUTFILE vs $COPYFILE"
+  if [ -x "$INDEXCMP" ]; then
+      $INDEXCMP "$OUTFILE" "$COPYFILE"
+      ret=$?
+      if [ $ret -eq 0 ]; then
+          echo "$OUTFILE and $COPYFILE match (indexcmp)."
+      else
+          echo "Differences found by indexcmp (exit code $ret)."
+      fi
+  else
+      diff -q "$OUTFILE" "$COPYFILE"
+      ret=$?
+    if [ $ret -eq 0 ]; then
+        echo "$OUTFILE and $COPYFILE match (diff)."
+    else
+        echo "Differences found by diff (exit code $ret)."
+    fi
+  fi
+done
+
+Indexing ../data/letters-0 -> ../data/indexes/letters-0.index
+indextest ../data/indexes/letters-0.index -> ../data/indexes/letters-0-copy.index
+Compare ../data/indexes/letters-0.index vs ../data/indexes/letters-0-copy.index
+../data/indexes/letters-0.index and ../data/indexes/letters-0-copy.index match (indexcmp).
+
+Indexing ../data/letters-1 -> ../data/indexes/letters-1.index
+indextest ../data/indexes/letters-1.index -> ../data/indexes/letters-1-copy.index
+Compare ../data/indexes/letters-1.index vs ../data/indexes/letters-1-copy.index
+../data/indexes/letters-1.index and ../data/indexes/letters-1-copy.index match (indexcmp).
+
+Indexing ../data/letters-2 -> ../data/indexes/letters-2.index
+indextest ../data/indexes/letters-2.index -> ../data/indexes/letters-2-copy.index
+Compare ../data/indexes/letters-2.index vs ../data/indexes/letters-2-copy.index
+../data/indexes/letters-2.index and ../data/indexes/letters-2-copy.index match (indexcmp).
+
+Indexing ../data/letters-10 -> ../data/indexes/letters-10.index
+indextest ../data/indexes/letters-10.index -> ../data/indexes/letters-10-copy.index
+Compare ../data/indexes/letters-10.index vs ../data/indexes/letters-10-copy.index
+../data/indexes/letters-10.index and ../data/indexes/letters-10-copy.index match (indexcmp).
+
+Indexing ../data/toscrape-0 -> ../data/indexes/toscrape-0.index
+indextest ../data/indexes/toscrape-0.index -> ../data/indexes/toscrape-0-copy.index
+Compare ../data/indexes/toscrape-0.index vs ../data/indexes/toscrape-0-copy.index
+../data/indexes/toscrape-0.index and ../data/indexes/toscrape-0-copy.index match (indexcmp).
+
+Indexing ../data/toscrape-1 -> ../data/indexes/toscrape-1.index
+indextest ../data/indexes/toscrape-1.index -> ../data/indexes/toscrape-1-copy.index
+Compare ../data/indexes/toscrape-1.index vs ../data/indexes/toscrape-1-copy.index
+../data/indexes/toscrape-1.index and ../data/indexes/toscrape-1-copy.index match (indexcmp).
+
+Indexing ../data/toscrape-3 -> ../data/indexes/toscrape-3.index
+indextest ../data/indexes/toscrape-3.index -> ../data/indexes/toscrape-3-copy.index
+Compare ../data/indexes/toscrape-3.index vs ../data/indexes/toscrape-3-copy.index
+../data/indexes/toscrape-3.index and ../data/indexes/toscrape-3-copy.index match (indexcmp).
+
+Indexing ../data/wikipedia-0 -> ../data/indexes/wikipedia-0.index
+indextest ../data/indexes/wikipedia-0.index -> ../data/indexes/wikipedia-0-copy.index
+Compare ../data/indexes/wikipedia-0.index vs ../data/indexes/wikipedia-0-copy.index
+../data/indexes/wikipedia-0.index and ../data/indexes/wikipedia-0-copy.index match (indexcmp).
+
+Indexing ../data/wikipedia-2 -> ../data/indexes/wikipedia-2.index
+indextest ../data/indexes/wikipedia-2.index -> ../data/indexes/wikipedia-2-copy.index
+Compare ../data/indexes/wikipedia-2.index vs ../data/indexes/wikipedia-2-copy.index
+../data/indexes/wikipedia-2.index and ../data/indexes/wikipedia-2-copy.index match (indexcmp).
+
+
+echo
+
+echo "Done"
+Done

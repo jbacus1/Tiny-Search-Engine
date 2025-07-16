@@ -1,0 +1,20 @@
+\0;10;1c# .gitignore for indexer file
+
+# Object files and libraries
+*.o
+*.a
+
+# Editor files
+*~
+\#*\#
+.\#*
+
+# Debugger files
+*.dSYM
+
+# Core dumps
+core
+
+# Indexer file
+indexer
+indextest
